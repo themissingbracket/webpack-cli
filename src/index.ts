@@ -1,22 +1,18 @@
-import { makeProjectFolder } from './ProjectBuilder/projectBuilder';
-import { BuildPackageJson } from './PackageBuilder/PackageBuilder';
+#! /usr/bin/env node
 
-const WORKFLOW:Array<(projectName:string)=>Promise<void>> = [
-	makeProjectFolder,
-	BuildPackageJson
-];
+import { buildProject } from './ProjectBuilder/projectBuilder';
+import { LoggerFactory } from './Logger/LoggerFactory';
+import { executeWorkflow } from './Utils/executeWorkFlow';
+const WORKFLOW:Array<(projectName:string)=>Promise<void>> = [ buildProject ];
 
-
-async function _executeWorkFlow(projectName:string, workflow:Array<(projectName:string)=>Promise<void>>):Promise<void> {
-	if(workflow.length === 0) return Promise.resolve();
-	const [currentTask, ...rest] =  workflow;
-	await currentTask(projectName);
-	_executeWorkFlow(projectName, rest);
-}
+const Logger  = LoggerFactory();
 
 
-const projectFile = 'TaskPlannerClient';
-_executeWorkFlow(projectFile, WORKFLOW)
-	.then(() => {
-		console.log(`${projectFile} created`);
-	}).catch(console.error);
+const argv = process.argv.slice(2);
+
+const projectName = argv[0];
+
+
+executeWorkflow<string>(WORKFLOW, projectName)
+	.then(() => Logger.info(`${projectName} created`))
+	.catch(Logger.error);

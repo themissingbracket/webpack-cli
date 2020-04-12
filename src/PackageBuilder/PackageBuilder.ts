@@ -1,7 +1,10 @@
 import { buildPackageJson, IPackage } from './templates/package.json.template';
 import { installDependecy } from './Dependency/installDependency';
+import { LoggerFactory } from '../Logger/LoggerFactory';
 
 
+
+const logger = LoggerFactory();
 
 function _projectExists(folder:string) :Promise<boolean> {
 	return import('../Utils/projectFileExists')
@@ -29,13 +32,14 @@ function _getPackageJsonFile(projectName:string):Promise<string> {
 }
 export async function BuildPackageJson (projectName:string):Promise<void> {
 	try {
+		logger.info(`Building ${projectName}...`);
 		const projectPath = await _getProjectPath(projectName);
 		
 		if(! await _projectExists(projectPath)) throw new Error(`Could not find ${projectName}`);
 
 		const pckg = await buildPackageJson(projectName);
 		const packageFile =  await _getPackageJsonFile(projectName);
-		_createFile(packageFile, pckg);
+		await _createFile(packageFile, pckg);
 		await installDependecy(projectPath);
 		return;
 

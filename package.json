@@ -7,7 +7,7 @@
     "test": "jest"
   },
   "bin": {
-    "build-cli": "./bin"
+    "build-cli": "./bin/index.js"
   },
   "repository": {
     "type": "git",
@@ -25,6 +25,7 @@
   "homepage": "https://github.com/themissingbracket/webpack-cli#readme",
   "devDependencies": {
     "@types/jest": "^25.2.1",
+    "@types/yargs": "^15.0.4",
     "@typescript-eslint/eslint-plugin": "^2.27.0",
     "@typescript-eslint/parser": "^2.27.0",
     "eslint": "^6.8.0",
@@ -35,6 +36,7 @@
   },
   "dependencies": {
     "@types/node": "^13.11.1",
-    "commander": "^5.0.0"
+    "chalk": "^4.0.0",
+    "yargs": "^15.3.1"
   }
 }

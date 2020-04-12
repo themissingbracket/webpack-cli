@@ -1,41 +1,33 @@
+import { buildSourceFolder } from './SourceBuilder/BuildSourceFolder';
 
-interface FileSystemModule{
-    existsSync(path:string):boolean
-    mkdirSync(path: string, options?: {}): string
-}
+import { executeWorkflow } from '../Utils/executeWorkFlow';
+import { validateProjectWorkflow } from './1ValidateProjectWorkflow/validateProjectWorkflow';
+import { createProjectFolderWorkflow } from './2CreateProjectFolderWorkflow/createProjectFolderWorkflow';
+import { LoggerFactory } from '../Logger/LoggerFactory';
+import { createSrcFolder } from './3CreateSrcDirectoryWorkflow/createSrcDirectoryWorkflow';
+import { setUpDepenciesWorkflow } from './6InstallDependencyWorkflow/installDependencyWorkflow';
 
-interface PathModule {
-    resolve(...pathSegements:Array<string>):string
-}
+const Workflow:Array<(projectName:string)=>Promise<void>> = [
+	// Validate Project Name
+	validateProjectWorkflow,
+	// Create Project  Root Directory
+	createProjectFolderWorkflow,
+	// Create Create Project SRC Directory
+	createSrcFolder,
+	// Create Webpack Config
+	// Create Jest Config
+	// Install Dependency
+	setUpDepenciesWorkflow
+];
 
-function _getProjectPath(folderName:string):Promise<string> {
-	return import('path')
-		.then(({default:Path}) => {
-			return Path.join(process.cwd(), folderName);
-		});
-}
-
-function _projectPathExists (folderPath:string):Promise<boolean> {
-	return import('../Utils/projectFileExists')
-		.then(({ default: projectFileExists }) => projectFileExists(folderPath));
-}
-
-function _createProjectFolder(folderPath:string):Promise<void> {
-	return import('fs')
-		.then(({default:fs}) => fs.mkdirSync(folderPath));
-}
-
-export async function makeProjectFolder(folderName:string):Promise<void> {
-	try {
-		const folderPath = await _getProjectPath(folderName);
-		if (await _projectPathExists(folderPath)) throw new Error(`${folderName} already exists`);
-		await _createProjectFolder(folderPath);
-		return Promise.resolve();
-		
-	} catch (error) {
-		Promise.reject(error);
-	}
-}
-
-
-
+export const buildProject = (folderName:string):Promise<void> => {
+	const logger = LoggerFactory();
+	logger.debug(`Building ${folderName}...`);
+	return executeWorkflow(Workflow, folderName)
+		.then(() => logger.success(`${folderName} created`))
+		.catch(err => {
+			logger.error(`Couldnot create ${folderName}`);
+			logger.error(err);
+		})
+	;
+};

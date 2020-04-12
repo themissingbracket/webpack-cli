@@ -1,4 +1,5 @@
 import { exec } from 'child_process';
+import { LoggerFactory } from '../../Logger/LoggerFactory';
 
 const devDependency:Array<string> = [
 	'webpack',
@@ -10,17 +11,27 @@ const devDependency:Array<string> = [
 
 const dependency:Array<string>  = [];
 
+const logger = LoggerFactory();
 
 
 export async function installDependecy(folderName:string):Promise<void> {
 	try {
-        console.log('Installing Dev Dependency');
-        await Promise.all(devDependency.map(d => new Promise((resolve,reject) => exec(`npm i ${d} --save-dev --prefix ${folderName}`,(err) => err ? reject(err):resolve()))));
-        console.log('Installing Dependencies');
-		await Promise.all(dependency.map(d => new Promise((resolve, reject) => exec(`npm i ${d} --save-dev --prefix ${folderName}`, (err) => err ? reject(err) : resolve()))));
+		logger.debug('Installing Dev Dependency');
+		await new Promise((resolve, reject) => {
+			const pckg = devDependency.join(' ');
+			exec(`npm i ${pckg} --save-dev --prefix ${folderName}`, (err) => err ? reject(err) :resolve());
+		});
+
+		// await Promise.all(devDependency.map(d => new Promise((resolve,reject) => exec(`npm i ${d} --save-dev --prefix ${folderName}`,(err) => err ? reject(err):resolve()))));
+		logger.debug('Installing Dependencies');
+		await new Promise((resolve, reject) => {
+			const pckg = dependency.join(' ');
+			exec(`npm i ${pckg} --save-dev --prefix ${folderName}`, (err) => err ? reject(err) : resolve());
+		});
+		// await Promise.all(dependency.map(d => new Promise((resolve, reject) => exec(`npm i ${d} --save-dev --prefix ${folderName}`, (err) => err ? reject(err) : resolve()))));
 
 	} catch (error) {
-		console.error('Couldnot install all dependencies');
-		console.error(error);
+		logger.error('Couldnot install all dependencies');
+		logger.error(error);
 	}
 }
