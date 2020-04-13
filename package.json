@@ -4,7 +4,8 @@
   "description": "A CLI tool to build client app using webpack",
   "main": "src/index.ts",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build":"tsc"
   },
   "bin": {
     "build-cli": "./bin/index.js"

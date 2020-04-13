@@ -12,12 +12,12 @@ const Workflow:Array<(projectName:string)=>Promise<void>> = [
 	validateProjectWorkflow,
 	// Create Project  Root Directory
 	createProjectFolderWorkflow,
+	// Install Dependency
+	setUpDepenciesWorkflow,
 	// Create Create Project SRC Directory
 	createSrcFolder,
 	// Create Webpack Config
 	// Create Jest Config
-	// Install Dependency
-	setUpDepenciesWorkflow
 ];
 
 export const buildProject = (folderName:string):Promise<void> => {
